@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateRentDto } from './dto/create-rent.dto';
@@ -19,7 +19,7 @@ export class RentsService {
       where: { user_id: userId, end_time: null }
     });
 
-    if (activeRentByUser) {
+    if (activeRentByUser.end_time === null) {
       throw new BadRequestException('User already has an active rent');
     }
 
@@ -28,7 +28,7 @@ export class RentsService {
       where: { scooter_id: scooterId, end_time: null }
     });
 
-    if (activeRentByScooter) {
+    if (activeRentByScooter.end_time === null) {
       throw new BadRequestException('Scooter is currently rented');
     }
 
@@ -37,6 +37,21 @@ export class RentsService {
       scooter_id: scooterId,
       start_time: startTime
     });
+    return this.rentRepository.save(rent);
+  }
+
+  async endRent(id: number, endTime: Date): Promise<Rent> {
+    const rent = await this.rentRepository.findOne({ where: { id: id } });
+
+    if (!rent) {
+      throw new NotFoundException('Rent not found');
+    }
+
+    if (rent.end_time) {
+      throw new NotFoundException('Rent already ended');
+    }
+
+    rent.end_time = endTime;
     return this.rentRepository.save(rent);
   }
 }

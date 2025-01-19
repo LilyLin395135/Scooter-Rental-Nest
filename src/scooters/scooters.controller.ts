@@ -13,7 +13,13 @@ export class ScootersController {
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Scooter created successfully',
-      scooter
+      scooter:{
+        id: scooter.id,
+        model: scooter.model,
+        licensePlate: scooter.license_plate,
+        available: scooter.available,
+        createdAt: scooter.created_at,
+      }
     };
   }
 }

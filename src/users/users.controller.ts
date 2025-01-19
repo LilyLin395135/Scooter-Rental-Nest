@@ -13,7 +13,12 @@ export class UsersController {
     return {
       statusCode: HttpStatus.CREATED,
       message: 'User created successfully',
-      user
+      user: {
+        id: user.id,
+        name: user.name,
+        cellphone: user.cellphone,
+        createdAt: user.created_at
+      }
     };
   }
 }
